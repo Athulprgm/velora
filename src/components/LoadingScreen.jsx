@@ -1,30 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function LoadingScreen({ onComplete }) {
-  const [progress, setProgress] = useState(0);
-
   useEffect(() => {
-    // Premium smooth progress counter reaching 100% in exactly 2.5 seconds
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 2; // increments every 50ms -> 50 * 50 = 2500ms
-      });
-    }, 50);
-
-    // Trigger smooth exit transition at 2.8 seconds
+    // Trigger smooth exit transition at 2.5 seconds
     const timer = setTimeout(() => {
       onComplete();
-    }, 2800);
+    }, 2500);
 
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, [onComplete]);
 
   // Premium curtain lift exit animation
@@ -84,7 +68,7 @@ export default function LoadingScreen({ onComplete }) {
         >
           <img 
             src="/logo.jpg" 
-            alt="Velora Handmade Premium Logo" 
+            alt="Veloura Handmade Premium Logo" 
             className="w-full h-full object-cover rounded-full"
           />
         </motion.div>
@@ -98,7 +82,7 @@ export default function LoadingScreen({ onComplete }) {
         className="flex flex-col items-center text-center z-10"
       >
         <h2 className="font-logo text-4xl md:text-5xl font-normal text-[var(--accent)] tracking-normal mb-1">
-          Velora
+          Veloura
         </h2>
         <p className="text-[10px] tracking-[0.5em] text-[var(--text-muted)] uppercase font-bold">
           Handmade Crochet Creations

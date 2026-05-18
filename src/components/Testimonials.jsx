@@ -36,7 +36,7 @@ const reviews = [
     id: 3,
     name: 'Divya K.',
     loc: 'Chennai',
-    comment: 'Ordered the bouquet for my mother. The packaging itself was beautiful. Velora is extraordinary.',
+    comment: 'Ordered the bouquet for my mother. The packaging itself was beautiful. Veloura is extraordinary.',
     init: 'D',
     product: {
       id: 2,
@@ -73,7 +73,7 @@ export default function Testimonials() {
             </h2>
           </div>
           <div className="max-w-md text-xs text-[var(--text-muted)] font-medium leading-relaxed">
-            Real feedback from verified patrons across India who have experienced the warmth and bespoke quality of Velora Handmade.
+            Real feedback from verified patrons across India who have experienced the warmth and bespoke quality of Veloura Handmade.
           </div>
         </motion.div>
 

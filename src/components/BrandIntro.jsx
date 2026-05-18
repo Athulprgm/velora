@@ -73,7 +73,7 @@ export default function BrandIntro() {
           </h2>
           <div className="section-divider mt-6 mb-8" />
           <p className="text-[#B89B6B] text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-light">
-            Velora Handmade creates premium crochet products blending elegance, softness, and timeless
+            Veloura Handmade creates premium crochet products blending elegance, softness, and timeless
             handmade beauty. Every piece is crafted with passion and attention to detail — a love letter
             woven in yarn.
           </p>

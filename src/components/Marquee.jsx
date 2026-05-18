@@ -1,5 +1,5 @@
 const items = ['Luxury Crochet', '✦', 'Handmade with Love', '✦', 'Premium Craftsmanship', '✦',
-  'Velora Handmade', '✦', 'Bespoke Artistry', '✦', 'Made in India', '✦'];
+  'Veloura Handmade', '✦', 'Bespoke Artistry', '✦', 'Made in India', '✦'];
 
 export default function Marquee() {
   const doubled = [...items, ...items];

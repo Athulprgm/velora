@@ -35,9 +35,9 @@ export default function Navbar() {
 
         {/* Logo with Image & Allura Script */}
         <Link to="/" className="flex items-center gap-3 leading-none group">
-          <img src="/logo.jpg" alt="Velora Handmade Logo" className="w-10 h-10 rounded-full object-cover border border-[var(--border)] shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" />
+          <img src="/logo.jpg" alt="Veloura Handmade Logo" className="w-10 h-10 rounded-full object-cover border border-[var(--border)] shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" />
           <div className="flex flex-col items-start">
-            <span className="font-logo text-3xl md:text-4xl font-normal text-[var(--accent)] tracking-normal group-hover:opacity-80 transition-opacity">Velora</span>
+            <span className="font-logo text-3xl md:text-4xl font-normal text-[var(--accent)] tracking-normal group-hover:opacity-80 transition-opacity">Veloura</span>
             <span className="text-[8px] tracking-[0.5em] text-[var(--text-muted)] uppercase font-bold -mt-1">Handmade</span>
           </div>
         </Link>
@@ -62,7 +62,7 @@ export default function Navbar() {
             className="gold-btn flex items-center gap-2 px-6 py-3 text-[11px] font-bold tracking-widest uppercase shadow-md hover:scale-105 transition-all"
           >
             <ShoppingBag size={14} />
-            Explore Shop
+            Explore Collection
           </Link>
         </div>
 
@@ -100,7 +100,7 @@ export default function Navbar() {
                 className="gold-btn flex items-center justify-center gap-2 py-4 text-xs font-bold tracking-widest uppercase shadow-md mt-2"
               >
                 <ShoppingBag size={16} />
-                Explore Shop
+                Explore Collection
               </Link>
             </div>
           </motion.div>

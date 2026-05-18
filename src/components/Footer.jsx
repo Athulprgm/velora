@@ -5,26 +5,26 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   const handleWhatsAppClick = () => {
-    const message = "Hello Velora Handmade, I'm interested in your crochet products. Please share catalog details.";
+    const message = "Hello Veloura Handmade, I'm interested in your crochet products. Please share catalog details.";
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/919497219574?text=${encoded}`, '_blank');
   };
 
   const handleNewsletter = (e) => {
     e.preventDefault();
-    alert('Thank you for subscribing to Velora Handmade journal!');
+    alert('Thank you for subscribing to Veloura Handmade journal!');
   };
 
   return (
-    <footer className="bg-[var(--card)] text-[var(--text)] transition-colors duration-300 border-t border-[var(--border)] pt-24 pb-16 px-6 md:px-12">
+    <footer className="bg-[var(--card)] text-[var(--text)] transition-colors duration-300 border-t border-[var(--border)] pt-24 pb-16 px-6 md:px-12 select-none">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-16 pb-20 border-b border-[var(--border)]">
         
         {/* Brand & Story */}
         <div className="lg:col-span-2 space-y-6">
           <Link to="/" className="flex items-center gap-3 leading-none group">
-            <img src="/logo.jpg" alt="Velora Handmade Logo" className="w-12 h-12 rounded-full object-cover border border-[var(--border)] shadow-md group-hover:scale-105 transition-transform flex-shrink-0" />
+            <img src="/logo.jpg" alt="Veloura Handmade Logo" className="w-12 h-12 rounded-full object-cover border border-[var(--border)] shadow-md group-hover:scale-105 transition-transform flex-shrink-0" />
             <div className="flex flex-col items-start">
-              <span className="font-logo text-4xl font-normal text-[var(--accent)] tracking-normal group-hover:opacity-80 transition-opacity">Velora</span>
+              <span className="font-logo text-4xl font-normal text-[var(--accent)] tracking-normal group-hover:opacity-80 transition-opacity">Veloura</span>
               <span className="text-[8px] tracking-[0.5em] text-[var(--text-muted)] uppercase font-bold -mt-1">Handmade</span>
             </div>
           </Link>
@@ -38,7 +38,7 @@ export default function Footer() {
             <button onClick={handleWhatsAppClick} className="w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--accent-secondary)] hover:text-white transition-all shadow-sm" aria-label="WhatsApp Order">
               <MessageCircle size={16} />
             </button>
-            <a href="mailto:contact@velorahandmade.com" className="w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--accent)] hover:text-white transition-all shadow-sm">
+            <a href="mailto:contact@velourahandmade.com" className="w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--accent)] hover:text-white transition-all shadow-sm">
               <Mail size={16} />
             </a>
           </div>
@@ -60,7 +60,7 @@ export default function Footer() {
           <h4 className="font-heading font-bold text-lg text-[var(--text)]">Studio Contact</h4>
           <ul className="space-y-4 text-xs font-medium text-[var(--text-muted)]">
             <li className="flex items-center gap-3"><Phone size={14} className="text-[var(--accent-secondary)]" /> +91 94972 19574</li>
-            <li className="flex items-center gap-3"><Mail size={14} className="text-[var(--accent)]" /> studio@velorahandmade.com</li>
+            <li className="flex items-center gap-3"><Mail size={14} className="text-[var(--accent)]" /> studio@velourahandmade.com</li>
             <li className="flex items-start gap-3"><MapPin size={16} className="text-[var(--accent-secondary)] flex-shrink-0 mt-0.5" /> Kochi, Kerala, India</li>
           </ul>
         </div>
@@ -95,7 +95,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-[var(--text-muted)] font-medium">
-        <p>© 2026 Velora Handmade. All rights reserved.</p>
+        <p>© 2026 Veloura Handmade. All rights reserved.</p>
         <div className="flex gap-6">
           <a href="#" className="hover:text-[var(--accent)] transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-[var(--accent)] transition-colors">Terms of Studio</a>

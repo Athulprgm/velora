@@ -45,7 +45,7 @@ export default function About() {
             <div className="w-12 h-[2px] bg-[var(--accent)] mb-6 rounded-full" />
 
             <p className="text-[var(--text-muted)] text-sm md:text-base font-medium leading-relaxed mb-10 max-w-lg">
-              Velora Handmade is an organic exploration of traditional crochet artistry. We create premium, soft luxury creations that celebrate the warmth of slow fashion and heirloom craftsmanship.
+              Veloura Handmade is an organic exploration of traditional crochet artistry. We create premium, soft luxury creations that celebrate the warmth of slow fashion and heirloom craftsmanship.
             </p>
 
             {/* Minimal Icon Illustrations */}

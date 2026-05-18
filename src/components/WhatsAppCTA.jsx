@@ -45,7 +45,7 @@ export default function WhatsAppCTA() {
               </div>
 
               <a
-                href="https://wa.me/919497219574?text=Hello%20Velora%20Handmade,%20I%20would%20like%20to%20place%20an%20order!"
+                href="https://wa.me/919497219574?text=Hello%20Veloura%20Handmade,%20I%20would%20like%20to%20place%20an%20order!"
                 target="_blank"
                 rel="noopener noreferrer"
                 id="main-whatsapp-cta"

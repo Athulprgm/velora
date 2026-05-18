@@ -37,7 +37,7 @@ export default function Checkout() {
     const baseUrl = window.location.origin;
     const imageUrl = `${baseUrl}${product.image}`;
 
-    const message = `*NEW ORDER INQUIRY* ✦ Velora Handmade
+    const message = `*NEW ORDER INQUIRY* ✦ Veloura Handmade
 -----------------------------------------
 *Product Details:*
 • Item: ${product.name}

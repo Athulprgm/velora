@@ -28,7 +28,7 @@ export default function InstagramGallery() {
         >
           <div>
             <p className="text-xs tracking-[0.4em] text-[var(--accent-secondary)] uppercase mb-3 font-bold">
-              @VeloraHandmade
+              @VelouraHandmade
             </p>
             <h2 className="font-heading text-3xl md:text-5xl font-bold text-[var(--text)] leading-tight tracking-tight">
               Instagram Gallery

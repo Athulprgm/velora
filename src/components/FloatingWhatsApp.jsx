@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function FloatingWhatsApp() {
   const handleFloatingClick = () => {
-    const message = "Hello Velora Handmade, I'm interested in this crochet product.";
+    const message = "Hello Veloura Handmade, I'm interested in this crochet product.";
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/919497219574?text=${encoded}`, '_blank');
   };

@@ -34,7 +34,7 @@ export default function BestSellers() {
   const inView = useInView(ref, { once: true, margin: '-60px' });
 
   const handleQuickWhatsAppOrder = (product) => {
-    const message = `Hello Velora Handmade, I'm interested in this crochet product: *${product.name}* (${product.price}). Please share delivery details.`;
+    const message = `Hello Veloura Handmade, I'm interested in this crochet product: *${product.name}* (${product.price}). Please share delivery details.`;
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/919497219574?text=${encoded}`, '_blank');
   };
