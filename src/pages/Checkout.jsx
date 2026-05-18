@@ -51,14 +51,24 @@ export default function Checkout() {
   const basePrice = parseInt(product.price.replace(/[^\d]/g, ''), 10);
 
   // Dynamic delivery charge calculation based on distance from Cheruvappadi
-  // User spec: 5km - ₹20 from Cheruvappadi. Beyond 5km, progressive rate e.g. ₹20 + ₹10/km. Default ₹40.
-  let deliveryCharge = 40; // Default charge if GPS not used
+  // User spec: Maximum applicable local delivery is 20 km. 
+  // 20+ km is Speed Post (flat ₹40) and distance details are not shown to the user in the UI.
+  let deliveryCharge = 40; // Default / Speed Post flat rate
+  let isLocalDelivery = false;
+
   if (gpsState.detected && gpsState.distanceKm !== null) {
-    if (gpsState.distanceKm <= 5) {
-      deliveryCharge = 20;
+    if (gpsState.distanceKm <= 20) {
+      isLocalDelivery = true;
+      if (gpsState.distanceKm <= 5) {
+        deliveryCharge = 20;
+      } else {
+        const extraKm = Math.ceil(gpsState.distanceKm - 5);
+        deliveryCharge = 20 + extraKm * 10;
+      }
     } else {
-      const extraKm = Math.ceil(gpsState.distanceKm - 5);
-      deliveryCharge = 20 + extraKm * 10;
+      // distance > 20km -> Speed post flat rate ₹40, hide local distance calculations in UI
+      isLocalDelivery = false;
+      deliveryCharge = 40;
     }
   }
 
@@ -129,10 +139,10 @@ export default function Checkout() {
     const baseUrl = window.location.origin;
     const imageUrl = `${baseUrl}${product.image}`;
 
-    // GPS tracking info for studio owner
+    // GPS tracking info for studio owner (always include for admin reference)
     let gpsString = 'Not detected / Manual Address';
     if (gpsState.detected) {
-      gpsString = `${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi Studio\n• Google Maps Pin: https://maps.google.com/?q=${gpsState.lat},${gpsState.lng}`;
+      gpsString = `${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi Studio (${isLocalDelivery ? 'Local Delivery' : 'Speed Post Shipping'})\n• Google Maps Pin: https://maps.google.com/?q=${gpsState.lat},${gpsState.lng}`;
     }
 
     const message = `*NEW ORDER INQUIRY* ✦ Veloura Handmade
@@ -140,7 +150,7 @@ export default function Checkout() {
 *Product Details:*
 • Item: ${product.name}
 • Price: ₹${basePrice}
-• Delivery Charge: ₹${deliveryCharge} ${gpsState.detected ? `(Calculated via GPS distance: ${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi)` : '(Default charge)'}
+• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Calculated via GPS distance: ${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi)` : '(Speed Post Flat Rate)'}
 • *Total Payable: ₹${totalPrice}*
 
 *Product Image:*
@@ -216,14 +226,19 @@ ${imageUrl}
                     </span>
                     <span className="font-bold text-[var(--text)]">₹{deliveryCharge}</span>
                   </div>
-                  {gpsState.detected && (
+                  {isLocalDelivery && (
                     <span className="text-[10px] text-[var(--accent-secondary)] font-bold flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} /> Calculated for {gpsState.distanceKm.toFixed(1)} km from Cheruvappadi Studio
+                      <MapPin size={10} /> Local Studio Delivery ({gpsState.distanceKm.toFixed(1)} km)
                     </span>
                   )}
                   {!gpsState.detected && (
                     <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
-                      (Detect GPS below for exact Cheruvappadi studio distance rates)
+                      (Detect GPS below for local Cheruvappadi delivery rates)
+                    </span>
+                  )}
+                  {gpsState.detected && !isLocalDelivery && (
+                    <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
+                      (Standard Speed Post Delivery)
                     </span>
                   )}
                 </div>
@@ -282,14 +297,26 @@ ${imageUrl}
               </div>
             )}
 
-            {gpsState.detected && (
+            {gpsState.detected && isLocalDelivery && (
               <div className="mb-6 p-4 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm">
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-[var(--accent)] flex-shrink-0" />
-                  <span>GPS Detected: <strong>{gpsState.distanceKm.toFixed(1)} km</strong> from Cheruvappadi Studio.</span>
+                  <span>Local Delivery Eligible: <strong>{gpsState.distanceKm.toFixed(1)} km</strong> from Studio.</span>
                 </div>
                 <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto">
                   Delivery Charge: ₹{deliveryCharge}
+                </span>
+              </div>
+            )}
+
+            {gpsState.detected && !isLocalDelivery && (
+              <div className="mb-6 p-4 rounded-2xl bg-[var(--border)]/20 border border-[var(--border)] text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm">
+                <div className="flex items-center gap-3">
+                  <Truck size={16} className="text-[var(--accent)] flex-shrink-0" />
+                  <span>Location detected. Eligible for nationwide Speed Post shipping.</span>
+                </div>
+                <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto whitespace-nowrap">
+                  Speed Post: ₹40
                 </span>
               </div>
             )}
