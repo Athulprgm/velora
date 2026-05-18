@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, ShieldCheck, Truck, Package, MapPin, Compass, AlertCircle } from 'lucide-react';
 
 // Cheruvappadi Volleyball Court Studio Origin Coordinates (Hosdurg, Kerala 671313)
-const CHERUVAPPADI_LAT = 12.261047;
-const CHERUVAPPADI_LNG = 75.263965;
+const CHERUVAPPADI_LAT = 12.261508631951251;
+const CHERUVAPPADI_LNG = 75.26928696052231;
 
 // Haversine formula to calculate distance in km between two GPS coordinates
 function calculateDistance(lat1, lon1, lat2, lon2) {

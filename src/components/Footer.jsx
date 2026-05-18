@@ -58,13 +58,12 @@ export default function Footer() {
         {/* Contact Details */}
         <div className="space-y-6">
           <h4 className="font-heading font-bold text-lg text-[var(--text)]">Studio Contact</h4>
-          <ul className="space-y-4 text-xs font-medium text-[var(--text-muted)]">
+          <ul className="space-y-4 text-xs font-medium text-[var(--text-muted)] mb-4">
             <li className="flex items-center gap-3"><Phone size={14} className="text-[var(--accent-secondary)]" /> +91 94972 19574</li>
             <li className="flex items-center gap-3"><Mail size={14} className="text-[var(--accent)]" /> studio@velourahandmade.com</li>
             <li className="flex items-start gap-3"><MapPin size={16} className="text-[var(--accent-secondary)] flex-shrink-0 mt-0.5" /> Cheruvappadi, Hosdurg, Kerala 671313</li>
           </ul>
-          {/* Studio Google Maps Embed */}
-          <div className="w-full h-36 rounded-2xl overflow-hidden border border-[var(--border)] shadow-inner">
+          <div className="w-full h-36 rounded-2xl overflow-hidden border border-[var(--border)] shadow-md bg-[var(--bg)]">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7797.622547943686!2d75.26396545869139!3d12.26104733138224!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba467000730ffe1%3A0x4cb1c338b1ab3e10!2sCheruvappadi%20volleyball%20court!5e0!3m2!1sen!2sin!4v1779108633229!5m2!1sen!2sin" 
               width="100%" 
@@ -73,7 +72,7 @@ export default function Footer() {
               allowFullScreen="" 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
-              title="Veloura Handmade Studio Map Pin"
+              title="Veloura Handmade Studio Location"
             />
           </div>
         </div>
