@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, ShieldCheck, Truck, Package, MapPin, Compass, AlertCircle } from 'lucide-react';
 
-// Cheruvappadi Studio Origin Coordinates (Ernakulam/Kochi region)
-const CHERUVAPPADI_LAT = 10.055;
-const CHERUVAPPADI_LNG = 76.355;
+// Cheruvappadi Volleyball Court Studio Origin Coordinates (Hosdurg, Kerala 671313)
+const CHERUVAPPADI_LAT = 12.3059;
+const CHERUVAPPADI_LNG = 75.0947;
 
 // Haversine formula to calculate distance in km between two GPS coordinates
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -258,7 +258,7 @@ ${imageUrl}
                   Shipping & Contact
                 </h2>
                 <p className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">
-                  Studio Origin: Cheruvappadi, Kerala (₹20 Delivery within 5km)
+                  Studio Origin: Cheruvappadi Volleyball Court, Hosdurg, Kerala 671313 (₹20 Delivery within 5km)
                 </p>
               </div>
 
