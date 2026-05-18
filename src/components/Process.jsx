@@ -4,23 +4,18 @@ import { motion, useInView } from 'framer-motion';
 const steps = [
   {
     num: '01',
-    title: 'Choose Your Pattern',
-    desc: 'Every piece starts as a vision — we carefully select premium yarn and design the pattern.',
+    title: 'Ethical Sourcing',
+    desc: 'Finest sustainable premium yarns.',
   },
   {
     num: '02',
-    title: 'Hand-Stitched',
-    desc: 'Crafted stitch by stitch using traditional crochet techniques passed down with love.',
+    title: 'Bespoke Artistry',
+    desc: 'Meticulous hand-stitching by master artisans.',
   },
   {
     num: '03',
-    title: 'Quality Checked',
-    desc: 'Each piece is inspected for perfection — only the finest leave the Velora studio.',
-  },
-  {
-    num: '04',
-    title: 'Delivered to You',
-    desc: 'Packaged beautifully and delivered with warmth, straight to your doorstep.',
+    title: 'Luxury Unboxing',
+    desc: 'Eco-friendly, memorable packaging.',
   },
 ];
 
@@ -29,8 +24,8 @@ export default function Process() {
   const inView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="process" className="py-28 px-8 md:px-16 bg-black">
-      <div className="max-w-6xl mx-auto">
+    <section id="process" className="py-28 px-6 md:px-12 bg-[var(--card)] transition-colors duration-300 border-t border-[var(--border)]">
+      <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <motion.div
@@ -38,47 +33,55 @@ export default function Process() {
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="mb-20"
+          className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6"
         >
-          <p className="text-[10px] tracking-[0.5em] text-[#D4AF37] uppercase mb-3">How We Create</p>
-          <div className="flex items-end gap-6">
-            <h2 className="font-heading text-4xl md:text-5xl font-bold text-[#E8D5B0] leading-tight">
-              The Velora Process
+          <div>
+            <p className="text-xs tracking-[0.4em] text-[var(--accent)] uppercase mb-3 font-bold">
+              Slow Fashion
+            </p>
+            <h2 className="font-heading text-3xl md:text-5xl font-bold text-[var(--text)] leading-tight tracking-tight">
+              The Production Cycle
             </h2>
-            <span className="hidden md:block flex-1 h-px bg-gradient-to-r from-[rgba(212,175,55,0.3)] to-transparent mb-2" />
+          </div>
+          <div className="max-w-md text-xs text-[var(--text-muted)] font-medium leading-relaxed">
+            True luxury cannot be rushed. Our commitment to slow fashion ensures each heirloom creation holds genuine, lasting value.
           </div>
         </motion.div>
 
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-[rgba(212,175,55,0.06)]">
+        {/* 3-Step Minimalist Timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
           {steps.map((step, i) => (
             <motion.div
               key={step.num}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              className="bg-black p-8 group hover:bg-[#060604] transition-colors duration-300"
+              transition={{ duration: 0.7, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex flex-col p-8 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--accent)] transition-all duration-500 group shadow-sm rounded-3xl"
             >
+              {/* Decorative Top Accent */}
+              <div className="absolute top-0 left-8 w-12 h-[2px] bg-[var(--accent)] group-hover:w-20 transition-all duration-500" />
+
               {/* Number */}
-              <p className="font-heading text-5xl font-bold text-[#1A1408] group-hover:text-[#2A2010] transition-colors mb-6 select-none">
-                {step.num}
-              </p>
+              <div className="flex items-baseline justify-between mb-8 pt-4">
+                <span className="font-heading text-4xl font-bold text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
+                  {step.num}
+                </span>
+                <span className="text-[9px] font-bold tracking-widest uppercase text-[var(--text-muted)]">
+                  Phase {i + 1}
+                </span>
+              </div>
 
-              {/* Gold line */}
-              <span
-                className="block h-px mb-6 bg-gradient-to-r from-[#D4AF37] to-transparent transition-all duration-500"
-                style={{ width: '40px' }}
-              />
-
-              <h3 className="font-heading text-lg font-semibold text-[#E8D5B0] mb-3 leading-snug">
+              <h3 className="font-heading text-2xl font-bold text-[var(--text)] mb-3 group-hover:text-[var(--accent)] transition-colors">
                 {step.title}
               </h3>
-              <p className="text-[#4A3C24] text-xs leading-relaxed font-light">
+
+              <p className="text-[var(--text-muted)] text-xs leading-relaxed font-medium mt-auto">
                 {step.desc}
               </p>
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );

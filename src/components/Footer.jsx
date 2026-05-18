@@ -1,103 +1,105 @@
 import { motion } from 'framer-motion';
-import { MessageCircle, Heart } from 'lucide-react';
-
-function InstagramIcon({ size = 14 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
-    </svg>
-  );
-}
-
-const navLinks = [
-  { label: 'Home', href: '#hero' },
-  { label: 'About', href: '#about' },
-  { label: 'Collection', href: '#shop' },
-  { label: 'Process', href: '#process' },
-  { label: 'Reviews', href: '#testimonials' },
-];
+import { MessageCircle, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
+import { InstagramIcon } from './icons/InstagramIcon';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
+  const handleWhatsAppClick = () => {
+    const message = "Hello Velora Handmade, I'm interested in your crochet products. Please share catalog details.";
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/919497219574?text=${encoded}`, '_blank');
+  };
+
+  const handleNewsletter = (e) => {
+    e.preventDefault();
+    alert('Thank you for subscribing to Velora Handmade journal!');
+  };
+
   return (
-    <footer className="border-t border-[var(--border)] pt-20 pb-10 px-8 md:px-16 bg-[var(--bg)] transition-colors duration-300">
-      <div className="max-w-6xl mx-auto">
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
-
-          {/* Brand */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-            <div className="font-heading text-3xl font-bold text-[var(--accent)] tracking-widest mb-1">VELORA</div>
-            <div className="text-[9px] tracking-[0.55em] text-[var(--text-muted)] uppercase mb-6">Handmade</div>
-            <p className="text-[var(--text-muted)] text-xs font-light leading-loose max-w-xs">
-              Luxury crochet creations crafted with warmth, detail, and timeless beauty — made in India.
-            </p>
-          </motion.div>
-
-          {/* Nav */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          >
-            <p className="text-[9px] tracking-[0.45em] uppercase text-[var(--accent)] mb-6">Navigate</p>
-            <div className="flex flex-col gap-3">
-              {navLinks.map(l => (
-                <a key={l.href} href={l.href}
-                  className="text-[var(--text-muted)] hover:text-[var(--text)] text-xs tracking-widest transition-colors duration-300">
-                  {l.label}
-                </a>
-              ))}
+    <footer className="bg-[var(--card)] text-[var(--text)] transition-colors duration-300 border-t border-[var(--border)] pt-24 pb-16 px-6 md:px-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-16 pb-20 border-b border-[var(--border)]">
+        
+        {/* Brand & Story */}
+        <div className="lg:col-span-2 space-y-6">
+          <Link to="/" className="flex items-center gap-3 leading-none group">
+            <img src="/logo.jpg" alt="Velora Handmade Logo" className="w-12 h-12 rounded-full object-cover border border-[var(--border)] shadow-md group-hover:scale-105 transition-transform flex-shrink-0" />
+            <div className="flex flex-col items-start">
+              <span className="font-logo text-4xl font-normal text-[var(--accent)] tracking-normal group-hover:opacity-80 transition-opacity">Velora</span>
+              <span className="text-[8px] tracking-[0.5em] text-[var(--text-muted)] uppercase font-bold -mt-1">Handmade</span>
             </div>
-          </motion.div>
-
-          {/* Contact */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-          >
-            <p className="text-[9px] tracking-[0.45em] uppercase text-[var(--accent)] mb-6">Connect</p>
-            <div className="flex flex-col gap-4">
-              <a href="https://wa.me/919497219574" target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-3 text-[var(--text-muted)] hover:text-[var(--text)] transition-colors group text-xs">
-                <MessageCircle size={14} className="flex-shrink-0 text-green-500" />
-                +91 94972 19574
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-3 text-[var(--text-muted)] hover:text-[var(--text)] transition-colors text-xs">
-                <InstagramIcon size={14} />
-                @velorahandmade
-              </a>
-            </div>
-
-            <div className="flex gap-3 mt-8">
-              <a href="https://wa.me/919497219574" target="_blank" rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full flex items-center justify-center border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-muted)] hover:text-[var(--accent)] transition-all duration-300">
-                <MessageCircle size={13} />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full flex items-center justify-center border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-muted)] hover:text-[var(--accent)] transition-all duration-300">
-                <InstagramIcon size={13} />
-              </a>
-            </div>
-          </motion.div>
+          </Link>
+          <p className="text-[var(--text-muted)] text-xs leading-relaxed font-medium max-w-sm">
+            Premium minimal elegant crochet creations. Meticulously handcrafted with warm, sustainable yarn to bring calm and soft luxury into your everyday life.
+          </p>
+          <div className="flex items-center gap-4 pt-2">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--accent)] hover:text-white transition-all shadow-sm">
+              <InstagramIcon size={16} />
+            </a>
+            <button onClick={handleWhatsAppClick} className="w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--accent-secondary)] hover:text-white transition-all shadow-sm" aria-label="WhatsApp Order">
+              <MessageCircle size={16} />
+            </button>
+            <a href="mailto:contact@velorahandmade.com" className="w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--accent)] hover:text-white transition-all shadow-sm">
+              <Mail size={16} />
+            </a>
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-[var(--border)] pt-8 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-[var(--text-muted)] text-[10px] tracking-widest uppercase">VELORA HANDMADE © 2026</p>
-          <p className="flex items-center gap-1.5 text-[var(--text-muted)] text-[10px] tracking-widest">
-            Crafted with <Heart size={10} fill="currentColor" className="text-[var(--accent)]" /> in India
+        {/* Quick Links */}
+        <div className="space-y-6">
+          <h4 className="font-heading font-bold text-lg text-[var(--text)]">Navigation</h4>
+          <ul className="space-y-4 text-xs font-medium text-[var(--text-muted)]">
+            <li><Link to="/" className="hover:text-[var(--accent)] transition-colors">Home</Link></li>
+            <li><Link to="/shop" className="hover:text-[var(--accent)] transition-colors">Collection</Link></li>
+            <li><a href="#about" className="hover:text-[var(--accent)] transition-colors">About Brand</a></li>
+            <li><a href="#bestsellers" className="hover:text-[var(--accent)] transition-colors">Best Sellers</a></li>
+          </ul>
+        </div>
+
+        {/* Contact Details */}
+        <div className="space-y-6">
+          <h4 className="font-heading font-bold text-lg text-[var(--text)]">Studio Contact</h4>
+          <ul className="space-y-4 text-xs font-medium text-[var(--text-muted)]">
+            <li className="flex items-center gap-3"><Phone size={14} className="text-[var(--accent-secondary)]" /> +91 94972 19574</li>
+            <li className="flex items-center gap-3"><Mail size={14} className="text-[var(--accent)]" /> studio@velorahandmade.com</li>
+            <li className="flex items-start gap-3"><MapPin size={16} className="text-[var(--accent-secondary)] flex-shrink-0 mt-0.5" /> Kochi, Kerala, India</li>
+          </ul>
+        </div>
+
+        {/* Minimal Newsletter */}
+        <div className="lg:col-span-1 space-y-6">
+          <h4 className="font-heading font-bold text-lg text-[var(--text)]">Journal</h4>
+          <p className="text-[10px] text-[var(--text-muted)] font-medium leading-relaxed">
+            Subscribe for exclusive releases, slow fashion insights, and bespoke private sales.
           </p>
+          <form onSubmit={handleNewsletter} className="flex items-center bg-[var(--bg)] border border-[var(--border)] rounded-full overflow-hidden p-1 shadow-inner">
+            <input 
+              type="email" 
+              required 
+              placeholder="Your email address" 
+              className="bg-transparent text-[11px] px-4 py-2 w-full text-[var(--text)] outline-none font-medium"
+            />
+            <button type="submit" className="w-8 h-8 rounded-full bg-[var(--accent)] text-white flex items-center justify-center flex-shrink-0 hover:bg-[var(--accent-hover)] transition-colors shadow-md">
+              <ArrowRight size={14} />
+            </button>
+          </form>
+
+          {/* WhatsApp CTA */}
+          <button 
+            onClick={handleWhatsAppClick}
+            className="secondary-btn w-full flex items-center justify-center gap-2 py-3 text-[10px] font-bold uppercase tracking-widest shadow-md mt-4"
+          >
+            <MessageCircle size={14} className="fill-current" /> WhatsApp Direct CTA
+          </button>
+        </div>
+
+      </div>
+
+      <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-[var(--text-muted)] font-medium">
+        <p>© 2026 Velora Handmade. All rights reserved.</p>
+        <div className="flex gap-6">
+          <a href="#" className="hover:text-[var(--accent)] transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-[var(--accent)] transition-colors">Terms of Studio</a>
+          <a href="#" className="hover:text-[var(--accent)] transition-colors">Shipping & Returns</a>
         </div>
       </div>
     </footer>

@@ -1,24 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg: #ffffff;
-  --text: #111111;
-  --text-muted: #666666;
-  --accent: #B89B6B;
-  --accent-hover: #D4AF37;
-  --border: #e2e2e2;
-  --card: #f9f9f9;
+  /* Velora Handmade JSON Specification Palette */
+  --bg: #F5EFE6; /* Soft Ivory */
+  --text: #4B4F3D; /* Deep Olive */
+  --text-muted: #6B705C; /* Sage Olive */
+  --accent: #6B705C; /* Sage Olive as primary button/accent */
+  --accent-secondary: #D08C74; /* Dusty Terracotta */
+  --accent-hover: #5A5E4D; /* Darker Sage Olive */
+  --border: #DCC5B2; /* Warm Beige */
+  --card: #FFFDF9; /* Cream White */
 }
 
 .dark {
-  --bg: #000000;
-  --text: #E8D5B0;
-  --text-muted: #8A7048;
-  --accent: #D4AF37;
-  --accent-hover: #F5D06A;
-  --border: rgba(212,175,55,0.15);
-  --card: #080808;
+  --bg: #22251C; /* Deep Organic Olive-Black */
+  --text: #FFFDF9; /* Cream White */
+  --text-muted: #DCC5B2; /* Warm Beige */
+  --accent: #D08C74; /* Dusty Terracotta */
+  --accent-secondary: #6B705C; /* Sage Olive */
+  --accent-hover: #E29D85;
+  --border: #4B4F3D; /* Deep Olive */
+  --card: #2D3125; /* Organic Olive Grey */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -27,7 +30,7 @@ html { scroll-behavior: smooth; }
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   transition: background-color 0.4s ease, color 0.4s ease;
@@ -37,44 +40,72 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
 
-.font-heading { font-family: 'Playfair Display', serif; }
+.font-heading { font-family: 'Cormorant Garamond', serif; }
+.font-logo { font-family: 'Allura', cursive; }
 
 .gold-line {
   display: block;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
   transform-origin: left;
 }
 
 .gold-btn {
   background: var(--accent);
-  color: #fff;
-  transition: all 0.3s ease;
+  color: #FFFDF9;
+  border-radius: 9999px;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 4px 20px rgba(107, 112, 92, 0.15);
 }
 .dark .gold-btn {
-  color: #000;
+  color: #FFFDF9;
+  box-shadow: 0 4px 20px rgba(208, 140, 116, 0.2);
 }
 .gold-btn:hover {
   background: var(--accent-hover);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(107, 112, 92, 0.25);
+}
+
+.secondary-btn {
+  background: var(--accent-secondary);
+  color: #FFFDF9;
+  border-radius: 9999px;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 4px 20px rgba(208, 140, 116, 0.15);
+}
+.secondary-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(208, 140, 116, 0.25);
 }
 
 .outline-btn {
   border: 1px solid var(--border);
   color: var(--text);
-  transition: all 0.3s ease;
+  border-radius: 9999px;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .outline-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(107, 112, 92, 0.08);
 }
 
 .card-minimal {
   background: var(--card);
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
+  border-radius: 24px;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card-minimal:hover {
   border-color: var(--accent);
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(107, 112, 92, 0.08);
+}
+.dark .card-minimal:hover {
+  box-shadow: 0 15px 35px rgba(208, 140, 116, 0.08);
 }
 
 .dark .grain::after {
