@@ -95,7 +95,7 @@ export default function LoadingScreen({ onComplete }) {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-col items-center text-center mb-10 z-10"
+        className="flex flex-col items-center text-center z-10"
       >
         <h2 className="font-logo text-4xl md:text-5xl font-normal text-[var(--accent)] tracking-normal mb-1">
           Velora
@@ -103,19 +103,6 @@ export default function LoadingScreen({ onComplete }) {
         <p className="text-[10px] tracking-[0.5em] text-[var(--text-muted)] uppercase font-bold">
           Handmade Crochet Creations
         </p>
-      </motion.div>
-
-      {/* Premium Indicator */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center justify-center gap-2 z-10 mt-2"
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-ping" />
-        <span className="text-[9px] tracking-[0.4em] text-[var(--accent-secondary)] uppercase font-bold">
-          Curating Soft Luxury
-        </span>
       </motion.div>
 
     </motion.div>
