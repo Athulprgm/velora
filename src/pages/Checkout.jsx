@@ -90,7 +90,18 @@ export default function Checkout() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        const dist = calculateDistance(CHERUVAPPADI_LAT, CHERUVAPPADI_LNG, latitude, longitude);
+        
+        // Calculate distance: Try OSRM Driving Route API first for true road driving distance, fallback to Haversine
+        let dist = calculateDistance(CHERUVAPPADI_LAT, CHERUVAPPADI_LNG, latitude, longitude);
+        try {
+          const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${CHERUVAPPADI_LNG},${CHERUVAPPADI_LAT};${longitude},${latitude}?overview=false`);
+          const osrmData = await osrmRes.json();
+          if (osrmData && osrmData.code === 'Ok' && osrmData.routes && osrmData.routes.length > 0) {
+            dist = osrmData.routes[0].distance / 1000; // Convert meters to km
+          }
+        } catch (err) {
+          console.warn('OSRM driving distance fetch failed, using Haversine fallback:', err);
+        }
         
         setGpsState({
           detecting: false,
