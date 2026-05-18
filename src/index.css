@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+  --text-muted: #666666;
+  --accent: #B89B6B;
+  --accent-hover: #D4AF37;
+  --border: #e2e2e2;
+  --card: #f9f9f9;
+}
+
+.dark {
+  --bg: #000000;
+  --text: #E8D5B0;
+  --text-muted: #8A7048;
+  --accent: #D4AF37;
+  --accent-hover: #F5D06A;
+  --border: rgba(212,175,55,0.15);
+  --card: #080808;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+.font-heading { font-family: 'Playfair Display', serif; }
+
+.gold-line {
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform-origin: left;
+}
+
+.gold-btn {
+  background: var(--accent);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+.dark .gold-btn {
+  color: #000;
+}
+.gold-btn:hover {
+  background: var(--accent-hover);
+}
+
+.outline-btn {
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+.outline-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.card-minimal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+.card-minimal:hover {
+  border-color: var(--accent);
+}
+
+.dark .grain::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 9999;
+}
