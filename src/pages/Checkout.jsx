@@ -1,7 +1,24 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageCircle, ShieldCheck, Truck, Package } from 'lucide-react';
+import { ArrowLeft, MessageCircle, ShieldCheck, Truck, Package, MapPin, Compass, AlertCircle } from 'lucide-react';
+
+// Cheruvappadi Studio Origin Coordinates (Ernakulam/Kochi region)
+const CHERUVAPPADI_LAT = 10.055;
+const CHERUVAPPADI_LNG = 76.355;
+
+// Haversine formula to calculate distance in km between two GPS coordinates
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
 
 export default function Checkout() {
   const location = useLocation();
@@ -21,13 +38,88 @@ export default function Checkout() {
     notes: '',
   });
 
-  // Numeric price calculation
+  const [gpsState, setGpsState] = useState({
+    detecting: false,
+    detected: false,
+    distanceKm: null,
+    error: null,
+    lat: null,
+    lng: null,
+  });
+
+  // Base price extraction
   const basePrice = parseInt(product.price.replace(/[^\d]/g, ''), 10);
-  const deliveryCharge = 40;
+
+  // Dynamic delivery charge calculation based on distance from Cheruvappadi
+  // User spec: 5km - ₹20 from Cheruvappadi. Beyond 5km, progressive rate e.g. ₹20 + ₹10/km. Default ₹40.
+  let deliveryCharge = 40; // Default charge if GPS not used
+  if (gpsState.detected && gpsState.distanceKm !== null) {
+    if (gpsState.distanceKm <= 5) {
+      deliveryCharge = 20;
+    } else {
+      const extraKm = Math.ceil(gpsState.distanceKm - 5);
+      deliveryCharge = 20 + extraKm * 10;
+    }
+  }
+
   const totalPrice = basePrice + deliveryCharge;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // GPS Location Detection Handler
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setGpsState(prev => ({ ...prev, error: 'GPS is not supported by your browser.' }));
+      return;
+    }
+
+    setGpsState({ detecting: true, detected: false, distanceKm: null, error: null, lat: null, lng: null });
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const dist = calculateDistance(CHERUVAPPADI_LAT, CHERUVAPPADI_LNG, latitude, longitude);
+        
+        setGpsState({
+          detecting: false,
+          detected: true,
+          distanceKm: dist,
+          error: null,
+          lat: latitude,
+          lng: longitude,
+        });
+
+        // Attempt reverse geocoding via OpenStreetMap Nominatim API to auto-fill City and Pincode
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          if (data && data.address) {
+            const city = data.address.city || data.address.town || data.address.village || data.address.county || form.city;
+            const pincode = data.address.postcode || form.pincode;
+            const road = data.address.road || data.address.suburb || '';
+            
+            setForm(prev => ({
+              ...prev,
+              city: city || prev.city,
+              pincode: pincode || prev.pincode,
+              address: prev.address ? prev.address : road,
+            }));
+          }
+        } catch (err) {
+          console.warn('Reverse geocoding failed:', err);
+        }
+      },
+      (error) => {
+        let errorMsg = 'Failed to detect location.';
+        if (error.code === 1) errorMsg = 'GPS location access was denied.';
+        if (error.code === 2) errorMsg = 'GPS location is currently unavailable.';
+        if (error.code === 3) errorMsg = 'GPS location detection timed out.';
+        setGpsState({ detecting: false, detected: false, distanceKm: null, error: errorMsg, lat: null, lng: null });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const handleWhatsAppSubmit = (e) => {
@@ -37,12 +129,18 @@ export default function Checkout() {
     const baseUrl = window.location.origin;
     const imageUrl = `${baseUrl}${product.image}`;
 
+    // GPS tracking info for studio owner
+    let gpsString = 'Not detected / Manual Address';
+    if (gpsState.detected) {
+      gpsString = `${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi Studio\n• Google Maps Pin: https://maps.google.com/?q=${gpsState.lat},${gpsState.lng}`;
+    }
+
     const message = `*NEW ORDER INQUIRY* ✦ Veloura Handmade
 -----------------------------------------
 *Product Details:*
 • Item: ${product.name}
 • Price: ₹${basePrice}
-• Delivery Charge: ₹${deliveryCharge}
+• Delivery Charge: ₹${deliveryCharge} ${gpsState.detected ? `(Calculated via GPS distance: ${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi)` : '(Default charge)'}
 • *Total Payable: ₹${totalPrice}*
 
 *Product Image:*
@@ -53,6 +151,9 @@ ${imageUrl}
 • Phone: ${form.phone}
 • Address: ${form.address}, ${form.city} - ${form.pincode}
 • Special Notes: ${form.notes || 'None'}
+
+*GPS Delivery Distance & Pin:*
+• ${gpsString}
 
 -----------------------------------------
 *Payment Mode:* Cash on Delivery / UPI Inquiry`;
@@ -65,7 +166,7 @@ ${imageUrl}
   };
 
   return (
-    <div className="min-h-screen pt-36 pb-32 px-6 md:px-12 bg-[var(--bg)] transition-colors duration-300">
+    <div className="min-h-screen pt-36 pb-32 px-6 md:px-12 bg-[var(--bg)] transition-colors duration-300 select-none">
       <div className="max-w-6xl mx-auto">
         
         {/* Back Button */}
@@ -106,10 +207,27 @@ ${imageUrl}
                   <span>Subtotal</span>
                   <span>₹{basePrice}</span>
                 </div>
-                <div className="flex justify-between text-[var(--text-muted)]">
-                  <span className="flex items-center gap-2"><Truck size={14} className="text-[var(--accent)]" /> Delivery Charge</span>
-                  <span>₹{deliveryCharge}</span>
+                
+                {/* Delivery Charge Display with GPS Status */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex justify-between text-[var(--text-muted)] items-center">
+                    <span className="flex items-center gap-2">
+                      <Truck size={14} className="text-[var(--accent)]" /> Delivery Charge
+                    </span>
+                    <span className="font-bold text-[var(--text)]">₹{deliveryCharge}</span>
+                  </div>
+                  {gpsState.detected && (
+                    <span className="text-[10px] text-[var(--accent-secondary)] font-bold flex items-center gap-1 mt-0.5">
+                      <MapPin size={10} /> Calculated for {gpsState.distanceKm.toFixed(1)} km from Cheruvappadi Studio
+                    </span>
+                  )}
+                  {!gpsState.detected && (
+                    <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
+                      (Detect GPS below for exact Cheruvappadi studio distance rates)
+                    </span>
+                  )}
                 </div>
+
                 <div className="flex justify-between text-[var(--text)] font-bold text-base border-t border-[var(--border)] pt-4">
                   <span>Total Payable</span>
                   <span className="font-heading text-xl text-[var(--accent)]">₹{totalPrice}</span>
@@ -132,14 +250,49 @@ ${imageUrl}
             </div>
           </div>
 
-          {/* Right Column: Checkout Form */}
+          {/* Right Column: Checkout Form with GPS Detection */}
           <div className="lg:col-span-7 card-minimal p-8 md:p-12 shadow-xl">
-            <h2 className="font-heading text-3xl font-bold text-[var(--text)] mb-2 tracking-tight">
-              Shipping & Contact
-            </h2>
-            <p className="text-xs text-[var(--text-muted)] font-medium mb-8 leading-relaxed">
-              Please enter your delivery details below. Clicking "Proceed to WhatsApp" will instantly generate your order ticket with a rich image preview for the owner.
-            </p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[var(--border)] pb-6">
+              <div>
+                <h2 className="font-heading text-3xl font-bold text-[var(--text)] mb-1 tracking-tight">
+                  Shipping & Contact
+                </h2>
+                <p className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">
+                  Studio Origin: Cheruvappadi, Kerala (₹20 Delivery within 5km)
+                </p>
+              </div>
+
+              {/* GPS Detection Button */}
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={gpsState.detecting}
+                className="secondary-btn flex items-center justify-center gap-2 px-5 py-3 text-[11px] font-bold uppercase tracking-widest shadow-md hover:scale-105 transition-all flex-shrink-0 disabled:opacity-50 disabled:hover:scale-100"
+              >
+                <Compass size={16} className={gpsState.detecting ? 'animate-spin' : ''} />
+                {gpsState.detecting ? 'Detecting GPS...' : 'Detect GPS Location'}
+              </button>
+            </div>
+
+            {/* GPS Status / Error Banners */}
+            {gpsState.error && (
+              <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-3 font-medium">
+                <AlertCircle size={16} className="flex-shrink-0" />
+                <span>{gpsState.error} Please enter your address manually below.</span>
+              </div>
+            )}
+
+            {gpsState.detected && (
+              <div className="mb-6 p-4 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm">
+                <div className="flex items-center gap-3">
+                  <MapPin size={16} className="text-[var(--accent)] flex-shrink-0" />
+                  <span>GPS Detected: <strong>{gpsState.distanceKm.toFixed(1)} km</strong> from Cheruvappadi Studio.</span>
+                </div>
+                <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto">
+                  Delivery Charge: ₹{deliveryCharge}
+                </span>
+              </div>
+            )}
 
             <form onSubmit={handleWhatsAppSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
