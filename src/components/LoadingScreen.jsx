@@ -105,29 +105,17 @@ export default function LoadingScreen({ onComplete }) {
         </p>
       </motion.div>
 
-      {/* Premium Slim Progress Bar */}
+      {/* Premium Indicator */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-xs flex flex-col gap-3 z-10"
+        className="flex items-center justify-center gap-2 z-10 mt-2"
       >
-        {/* Razor-thin 2px Loading Track */}
-        <div className="w-full h-[2px] bg-[var(--border)] rounded-full overflow-hidden relative shadow-inner">
-          <motion.div 
-            className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] rounded-full"
-            initial={{ width: "0%" }}
-            animate={{ width: `${progress}%` }}
-            transition={{ ease: "linear", duration: 0.05 }}
-          />
-        </div>
-
-        <div className="flex items-center justify-center gap-2 mt-1">
-          <span className="w-1 h-1 rounded-full bg-[var(--accent)] animate-ping" />
-          <span className="text-[8px] tracking-[0.4em] text-[var(--accent-secondary)] uppercase font-bold">
-            Curating Soft Luxury
-          </span>
-        </div>
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-ping" />
+        <span className="text-[9px] tracking-[0.4em] text-[var(--accent-secondary)] uppercase font-bold">
+          Curating Soft Luxury
+        </span>
       </motion.div>
 
     </motion.div>
