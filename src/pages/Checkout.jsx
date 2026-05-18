@@ -91,16 +91,23 @@ export default function Checkout() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         
-        // Calculate distance: Try OSRM Driving Route API first for true road driving distance, fallback to Haversine
+        // Calculate distance: Try OSRM Bike Route API first for shortest bike path distance, fallback to Haversine
         let dist = calculateDistance(CHERUVAPPADI_LAT, CHERUVAPPADI_LNG, latitude, longitude);
         try {
-          const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${CHERUVAPPADI_LNG},${CHERUVAPPADI_LAT};${longitude},${latitude}?overview=false`);
+          const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/bike/${CHERUVAPPADI_LNG},${CHERUVAPPADI_LAT};${longitude},${latitude}?overview=false&alternatives=true`);
           const osrmData = await osrmRes.json();
           if (osrmData && osrmData.code === 'Ok' && osrmData.routes && osrmData.routes.length > 0) {
-            dist = osrmData.routes[0].distance / 1000; // Convert meters to km
+            // Find the route with the minimum distance (shortest bike route)
+            let minMeters = osrmData.routes[0].distance;
+            for (const r of osrmData.routes) {
+              if (r.distance < minMeters) {
+                minMeters = r.distance;
+              }
+            }
+            dist = minMeters / 1000; // Convert meters to km
           }
         } catch (err) {
-          console.warn('OSRM driving distance fetch failed, using Haversine fallback:', err);
+          console.warn('OSRM bike distance fetch failed, using Haversine fallback:', err);
         }
         
         setGpsState({
