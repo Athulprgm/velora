@@ -51,13 +51,13 @@ export default function Checkout() {
   const basePrice = parseInt(product.price.replace(/[^\d]/g, ''), 10);
 
   // Dynamic delivery charge calculation based on distance from Cheruvappadi
-  // User spec: Maximum applicable local delivery is 20 km. 
-  // 20+ km is Speed Post (flat ₹40) and distance details are not shown to the user in the UI.
+  // User spec: Maximum applicable local delivery is 50 km. 
+  // 50+ km is Speed Post (flat ₹40) and distance details are not shown to the user in the UI.
   let deliveryCharge = 40; // Default / Speed Post flat rate
   let isLocalDelivery = false;
 
   if (gpsState.detected && gpsState.distanceKm !== null) {
-    if (gpsState.distanceKm <= 20) {
+    if (gpsState.distanceKm <= 50) {
       isLocalDelivery = true;
       if (gpsState.distanceKm <= 5) {
         deliveryCharge = 20;
@@ -66,7 +66,7 @@ export default function Checkout() {
         deliveryCharge = 20 + extraKm * 10;
       }
     } else {
-      // distance > 20km -> Speed post flat rate ₹40, hide local distance calculations in UI
+      // distance > 50km -> Speed post flat rate ₹40, hide local distance calculations in UI
       isLocalDelivery = false;
       deliveryCharge = 40;
     }
