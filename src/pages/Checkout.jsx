@@ -273,7 +273,7 @@ ${imageUrl}
                   Shipping & Contact
                 </h2>
                 <p className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">
-                  Studio Origin: Cheruvappadi Volleyball Court, Hosdurg, Kerala 671313 (₹20 Delivery within 5km)
+                  Please enter your delivery details below.
                 </p>
               </div>
 
