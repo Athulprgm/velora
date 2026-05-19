@@ -3,22 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, ShieldCheck, Truck, Package, MapPin, Compass, AlertCircle } from 'lucide-react';
 
-// Cheruvappadi Volleyball Court Studio Origin Coordinates (Hosdurg, Kerala 671313)
-const CHERUVAPPADI_LAT = 12.261508631951251;
-const CHERUVAPPADI_LNG = 75.26928696052231;
-
-// Haversine formula to calculate distance in km between two GPS coordinates
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Earth radius in km
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a = 
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
-}
+// Local Pincodes mapping (maximum limit 20 km from studio)
+const LOCAL_PINCODES = {
+  '671313': { name: 'Cheruvappadi/Hosdurg', distanceKm: 5 }, // Cheruvappadi origin
+  '671310': { name: 'Pilicode/Trikarpur', distanceKm: 8 },    // Pilicode (5 km) / Trikarpur (8 km)
+  '671314': { name: 'Nileshwar', distanceKm: 10 },           // Nileshwar (10 km)
+  '671326': { name: 'Chittarikkal', distanceKm: 15 },         // Chittarikkal (15 km)
+  '671315': { name: 'Kanhangad', distanceKm: 18 },           // Kanhangad (15-18 km)
+};
 
 export default function Checkout() {
   const location = useLocation();
@@ -41,7 +33,6 @@ export default function Checkout() {
   const [gpsState, setGpsState] = useState({
     detecting: false,
     detected: false,
-    distanceKm: null,
     error: null,
     lat: null,
     lng: null,
@@ -50,25 +41,21 @@ export default function Checkout() {
   // Base price extraction
   const basePrice = parseInt(product.price.replace(/[^\d]/g, ''), 10);
 
-  // Dynamic delivery charge calculation based on distance from Cheruvappadi
-  // User spec: Maximum applicable local delivery is 50 km. 
-  // 50+ km is Speed Post (flat ₹40) and distance details are not shown to the user in the UI.
-  let deliveryCharge = 40; // Default / Speed Post flat rate
+  // Dynamic delivery charge calculation based on Pincode (local delivery up to 20 km)
+  const currentPin = form.pincode ? form.pincode.trim() : '';
+  const localPinData = LOCAL_PINCODES[currentPin];
   let isLocalDelivery = false;
+  let localDistance = null;
+  let deliveryCharge = 40; // Default flat rate (Speed Post)
 
-  if (gpsState.detected && gpsState.distanceKm !== null) {
-    if (gpsState.distanceKm <= 50) {
-      isLocalDelivery = true;
-      if (gpsState.distanceKm <= 5) {
-        deliveryCharge = 20;
-      } else {
-        const extraKm = Math.ceil(gpsState.distanceKm - 5);
-        deliveryCharge = 20 + extraKm * 10;
-      }
+  if (localPinData) {
+    isLocalDelivery = true;
+    localDistance = localPinData.distanceKm;
+    if (localDistance <= 5) {
+      deliveryCharge = 20;
     } else {
-      // distance > 50km -> Speed post flat rate ₹40, hide local distance calculations in UI
-      isLocalDelivery = false;
-      deliveryCharge = 40;
+      const extraKm = Math.ceil(localDistance - 5);
+      deliveryCharge = 20 + extraKm * 10;
     }
   }
 
@@ -78,14 +65,14 @@ export default function Checkout() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // GPS Location Detection Handler
+  // GPS Location Detection Handler (Reverse Geocoding only to get Pincode and Address)
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
       setGpsState(prev => ({ ...prev, error: 'GPS is not supported by your browser.' }));
       return;
     }
 
-    setGpsState({ detecting: true, detected: false, distanceKm: null, error: null, lat: null, lng: null });
+    setGpsState({ detecting: true, detected: false, error: null, lat: null, lng: null });
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -95,51 +82,9 @@ export default function Checkout() {
         const geoapifyKey = import.meta.env.VITE_GEOAPIFY_API_KEY;
         const hasGeoapifyKey = geoapifyKey && geoapifyKey !== 'YOUR_GEOAPIFY_API_KEY' && geoapifyKey.trim() !== '';
 
-        // Calculate distance: Try Geoapify Routing first, fallback to OSRM, then Haversine
-        let dist = calculateDistance(CHERUVAPPADI_LAT, CHERUVAPPADI_LNG, latitude, longitude);
-        let distanceCalculated = false;
-
-        if (hasGeoapifyKey) {
-          try {
-            // Geoapify Routing API (bicycle profile)
-            const geoRes = await fetch(`https://api.geoapify.com/v1/routing?waypoints=${CHERUVAPPADI_LAT},${CHERUVAPPADI_LNG}|${latitude},${longitude}&mode=bicycle&apiKey=${geoapifyKey}`);
-            const geoData = await geoRes.json();
-            if (geoData && geoData.features && geoData.features.length > 0) {
-              const meters = geoData.features[0].properties.distance;
-              dist = meters / 1000; // convert to km
-              distanceCalculated = true;
-              console.log('Distance calculated using Geoapify Routing:', dist);
-            }
-          } catch (err) {
-            console.warn('Geoapify routing failed, attempting OSRM fallback:', err);
-          }
-        }
-
-        if (!distanceCalculated) {
-          try {
-            const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/bike/${CHERUVAPPADI_LNG},${CHERUVAPPADI_LAT};${longitude},${latitude}?overview=false&alternatives=true`);
-            const osrmData = await osrmRes.json();
-            if (osrmData && osrmData.code === 'Ok' && osrmData.routes && osrmData.routes.length > 0) {
-              // Find the route with the minimum distance (shortest bike route)
-              let minMeters = osrmData.routes[0].distance;
-              for (const r of osrmData.routes) {
-                if (r.distance < minMeters) {
-                  minMeters = r.distance;
-                }
-              }
-              dist = minMeters / 1000; // Convert meters to km
-              distanceCalculated = true;
-              console.log('Distance calculated using OSRM:', dist);
-            }
-          } catch (err) {
-            console.warn('OSRM bike distance fetch failed, using Haversine fallback:', err);
-          }
-        }
-        
         setGpsState({
           detecting: false,
           detected: true,
-          distanceKm: dist,
           error: null,
           lat: latitude,
           lng: longitude,
@@ -153,7 +98,6 @@ export default function Checkout() {
             const geoGeoRes = await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${geoapifyKey}`);
             const geoGeoData = await geoGeoRes.json();
             
-            // Handle both flat JSON format (results array) and standard GeoJSON format (features array)
             let result = null;
             if (geoGeoData && geoGeoData.results && geoGeoData.results.length > 0) {
               result = geoGeoData.results[0];
@@ -162,8 +106,8 @@ export default function Checkout() {
             }
 
             if (result) {
-              const city = result.city || result.town || result.village || result.county || form.city;
-              const pincode = result.postcode || form.pincode;
+              const city = result.city || result.town || result.village || result.county || '';
+              const pincode = result.postcode || '';
               const road = result.street || result.suburb || result.name || '';
               
               setForm(prev => ({
@@ -185,8 +129,8 @@ export default function Checkout() {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
             const data = await res.json();
             if (data && data.address) {
-              const city = data.address.city || data.address.town || data.address.village || data.address.county || form.city;
-              const pincode = data.address.postcode || form.pincode;
+              const city = data.address.city || data.address.town || data.address.village || data.address.county || '';
+              const pincode = data.address.postcode || '';
               const road = data.address.road || data.address.suburb || '';
               
               setForm(prev => ({
@@ -207,7 +151,7 @@ export default function Checkout() {
         if (error.code === 1) errorMsg = 'GPS location access was denied.';
         if (error.code === 2) errorMsg = 'GPS location is currently unavailable.';
         if (error.code === 3) errorMsg = 'GPS location detection timed out.';
-        setGpsState({ detecting: false, detected: false, distanceKm: null, error: errorMsg, lat: null, lng: null });
+        setGpsState({ detecting: false, detected: false, error: errorMsg, lat: null, lng: null });
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -223,7 +167,7 @@ export default function Checkout() {
     // GPS tracking info for studio owner (always include for admin reference)
     let gpsString = 'Not detected / Manual Address';
     if (gpsState.detected) {
-      gpsString = `${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi Studio (${isLocalDelivery ? 'Local Delivery' : 'Speed Post Shipping'})\n• Google Maps Pin: https://maps.google.com/?q=${gpsState.lat},${gpsState.lng}`;
+      gpsString = `GPS Coordinates: https://maps.google.com/?q=${gpsState.lat},${gpsState.lng}`;
     }
 
     const message = `*NEW ORDER INQUIRY* ✦ Veloura Handmade
@@ -231,7 +175,7 @@ export default function Checkout() {
 *Product Details:*
 • Item: ${product.name}
 • Price: ₹${basePrice}
-• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Calculated via GPS distance: ${gpsState.distanceKm.toFixed(1)} km from Cheruvappadi)` : '(Speed Post Flat Rate)'}
+• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Local Pincode: ${localDistance} km)` : '(Speed Post Flat Rate)'}
 • *Total Payable: ₹${totalPrice}*
 
 *Product Image:*
@@ -243,8 +187,9 @@ ${imageUrl}
 • Address: ${form.address}, ${form.city} - ${form.pincode}
 • Special Notes: ${form.notes || 'None'}
 
-*GPS Delivery Distance & Pin:*
-• ${gpsString}
+*Delivery Distance & GPS (if used):*
+• Pincode distance: ${isLocalDelivery ? `${localDistance} km` : 'Nationwide / Non-local'}
+• GPS: ${gpsString}
 
 -----------------------------------------
 *Payment Mode:* Cash on Delivery / UPI Inquiry`;
@@ -299,7 +244,7 @@ ${imageUrl}
                   <span>₹{basePrice}</span>
                 </div>
                 
-                {/* Delivery Charge Display with GPS Status */}
+                {/* Delivery Charge Display with Pincode Status */}
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between text-[var(--text-muted)] items-center">
                     <span className="flex items-center gap-2">
@@ -308,18 +253,18 @@ ${imageUrl}
                     <span className="font-bold text-[var(--text)]">₹{deliveryCharge}</span>
                   </div>
                   {isLocalDelivery && (
-                    <span className="text-[10px] text-[var(--accent-secondary)] font-bold flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} /> Local Studio Delivery ({gpsState.distanceKm.toFixed(1)} km)
+                    <span className="text-[10px] text-[var(--accent-secondary)] font-bold flex items-center gap-1 mt-0.5 animate-fadeIn">
+                      <MapPin size={10} /> Local Studio Delivery ({localDistance} km via Pincode)
                     </span>
                   )}
-                  {!gpsState.detected && (
-                    <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
-                      (Detect GPS below for local Cheruvappadi delivery rates)
-                    </span>
-                  )}
-                  {gpsState.detected && !isLocalDelivery && (
-                    <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
+                  {!isLocalDelivery && form.pincode.trim().length >= 6 && (
+                    <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5 animate-fadeIn">
                       (Standard Speed Post Delivery)
+                    </span>
+                  )}
+                  {!isLocalDelivery && form.pincode.trim().length < 6 && (
+                    <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
+                      (Enter local pincode or detect GPS for local rates)
                     </span>
                   )}
                 </div>
@@ -370,7 +315,7 @@ ${imageUrl}
               </button>
             </div>
 
-            {/* GPS Status / Error Banners */}
+            {/* GPS Error Banner */}
             {gpsState.error && (
               <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-3 font-medium">
                 <AlertCircle size={16} className="flex-shrink-0" />
@@ -378,11 +323,12 @@ ${imageUrl}
               </div>
             )}
 
-            {gpsState.detected && isLocalDelivery && (
-              <div className="mb-6 p-4 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm">
+            {/* Local Delivery Banner */}
+            {isLocalDelivery && (
+              <div className="mb-6 p-4 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm animate-fadeIn">
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-[var(--accent)] flex-shrink-0" />
-                  <span>Local Delivery Eligible: <strong>{gpsState.distanceKm.toFixed(1)} km</strong> from Studio.</span>
+                  <span>Local Delivery Eligible: <strong>{localDistance} km</strong> ({localPinData.name} - Pincode {form.pincode}).</span>
                 </div>
                 <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto">
                   Delivery Charge: ₹{deliveryCharge}
@@ -390,11 +336,12 @@ ${imageUrl}
               </div>
             )}
 
-            {gpsState.detected && !isLocalDelivery && (
-              <div className="mb-6 p-4 rounded-2xl bg-[var(--border)]/20 border border-[var(--border)] text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm">
+            {/* Nationwide Speed Post Banner */}
+            {!isLocalDelivery && form.pincode.trim().length >= 6 && (
+              <div className="mb-6 p-4 rounded-2xl bg-[var(--border)]/20 border border-[var(--border)] text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm animate-fadeIn">
                 <div className="flex items-center gap-3">
                   <Truck size={16} className="text-[var(--accent)] flex-shrink-0" />
-                  <span>Location detected. Eligible for nationwide Speed Post shipping.</span>
+                  <span>Nationwide Speed Post shipping (Pincode: {form.pincode}).</span>
                 </div>
                 <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto whitespace-nowrap">
                   Speed Post: ₹40
