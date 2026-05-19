@@ -91,23 +91,49 @@ export default function Checkout() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         
-        // Calculate distance: Try OSRM Bike Route API first for shortest bike path distance, fallback to Haversine
+        // Fetch Geoapify API key if configured
+        const geoapifyKey = import.meta.env.VITE_GEOAPIFY_API_KEY;
+        const hasGeoapifyKey = geoapifyKey && geoapifyKey !== 'YOUR_GEOAPIFY_API_KEY' && geoapifyKey.trim() !== '';
+
+        // Calculate distance: Try Geoapify Routing first, fallback to OSRM, then Haversine
         let dist = calculateDistance(CHERUVAPPADI_LAT, CHERUVAPPADI_LNG, latitude, longitude);
-        try {
-          const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/bike/${CHERUVAPPADI_LNG},${CHERUVAPPADI_LAT};${longitude},${latitude}?overview=false&alternatives=true`);
-          const osrmData = await osrmRes.json();
-          if (osrmData && osrmData.code === 'Ok' && osrmData.routes && osrmData.routes.length > 0) {
-            // Find the route with the minimum distance (shortest bike route)
-            let minMeters = osrmData.routes[0].distance;
-            for (const r of osrmData.routes) {
-              if (r.distance < minMeters) {
-                minMeters = r.distance;
-              }
+        let distanceCalculated = false;
+
+        if (hasGeoapifyKey) {
+          try {
+            // Geoapify Routing API (bicycle profile)
+            const geoRes = await fetch(`https://api.geoapify.com/v1/routing?waypoints=${CHERUVAPPADI_LAT},${CHERUVAPPADI_LNG}|${latitude},${longitude}&mode=bicycle&apiKey=${geoapifyKey}`);
+            const geoData = await geoRes.json();
+            if (geoData && geoData.features && geoData.features.length > 0) {
+              const meters = geoData.features[0].properties.distance;
+              dist = meters / 1000; // convert to km
+              distanceCalculated = true;
+              console.log('Distance calculated using Geoapify Routing:', dist);
             }
-            dist = minMeters / 1000; // Convert meters to km
+          } catch (err) {
+            console.warn('Geoapify routing failed, attempting OSRM fallback:', err);
           }
-        } catch (err) {
-          console.warn('OSRM bike distance fetch failed, using Haversine fallback:', err);
+        }
+
+        if (!distanceCalculated) {
+          try {
+            const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/bike/${CHERUVAPPADI_LNG},${CHERUVAPPADI_LAT};${longitude},${latitude}?overview=false&alternatives=true`);
+            const osrmData = await osrmRes.json();
+            if (osrmData && osrmData.code === 'Ok' && osrmData.routes && osrmData.routes.length > 0) {
+              // Find the route with the minimum distance (shortest bike route)
+              let minMeters = osrmData.routes[0].distance;
+              for (const r of osrmData.routes) {
+                if (r.distance < minMeters) {
+                  minMeters = r.distance;
+                }
+              }
+              dist = minMeters / 1000; // Convert meters to km
+              distanceCalculated = true;
+              console.log('Distance calculated using OSRM:', dist);
+            }
+          } catch (err) {
+            console.warn('OSRM bike distance fetch failed, using Haversine fallback:', err);
+          }
         }
         
         setGpsState({
@@ -119,24 +145,61 @@ export default function Checkout() {
           lng: longitude,
         });
 
-        // Attempt reverse geocoding via OpenStreetMap Nominatim API to auto-fill City and Pincode
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-          const data = await res.json();
-          if (data && data.address) {
-            const city = data.address.city || data.address.town || data.address.village || data.address.county || form.city;
-            const pincode = data.address.postcode || form.pincode;
-            const road = data.address.road || data.address.suburb || '';
+        // Reverse Geocoding: Try Geoapify Geocoding API first, fallback to OSM Nominatim
+        let geocoded = false;
+
+        if (hasGeoapifyKey) {
+          try {
+            const geoGeoRes = await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${geoapifyKey}`);
+            const geoGeoData = await geoGeoRes.json();
             
-            setForm(prev => ({
-              ...prev,
-              city: city || prev.city,
-              pincode: pincode || prev.pincode,
-              address: prev.address ? prev.address : road,
-            }));
+            // Handle both flat JSON format (results array) and standard GeoJSON format (features array)
+            let result = null;
+            if (geoGeoData && geoGeoData.results && geoGeoData.results.length > 0) {
+              result = geoGeoData.results[0];
+            } else if (geoGeoData && geoGeoData.features && geoGeoData.features.length > 0) {
+              result = geoGeoData.features[0].properties;
+            }
+
+            if (result) {
+              const city = result.city || result.town || result.village || result.county || form.city;
+              const pincode = result.postcode || form.pincode;
+              const road = result.street || result.suburb || result.name || '';
+              
+              setForm(prev => ({
+                ...prev,
+                city: city || prev.city,
+                pincode: pincode || prev.pincode,
+                address: prev.address ? prev.address : road,
+              }));
+              geocoded = true;
+              console.log('Address resolved using Geoapify:', result);
+            }
+          } catch (err) {
+            console.warn('Geoapify reverse geocoding failed, attempting Nominatim fallback:', err);
           }
-        } catch (err) {
-          console.warn('Reverse geocoding failed:', err);
+        }
+
+        if (!geocoded) {
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await res.json();
+            if (data && data.address) {
+              const city = data.address.city || data.address.town || data.address.village || data.address.county || form.city;
+              const pincode = data.address.postcode || form.pincode;
+              const road = data.address.road || data.address.suburb || '';
+              
+              setForm(prev => ({
+                ...prev,
+                city: city || prev.city,
+                pincode: pincode || prev.pincode,
+                address: prev.address ? prev.address : road,
+              }));
+              console.log('Address resolved using OSM Nominatim');
+            }
+          } catch (err) {
+            console.warn('Reverse geocoding failed:', err);
+          }
         }
       },
       (error) => {
