@@ -41,6 +41,11 @@ export default function Checkout() {
       { name: 'Cheruvappadi Volleyball Court', keyword: 'cheruvappadi', distanceKm: 5 },
       { name: 'Pilicode', keyword: 'pilicode', distanceKm: 5 },
       { name: 'Trikarpur', keyword: 'trikarpur', distanceKm: 8 },
+      { name: 'Cheemeni', keyword: 'cheemeni', distanceKm: 7 },
+      { name: 'Chanadukkam', keyword: 'chanadukkam', distanceKm: 2 },
+      { name: 'Chanadukkam', keyword: 'chanadukkanm', distanceKm: 2 }, // Typo fallback
+      { name: 'Aravanchal', keyword: 'aravanchal', distanceKm: 12 },
+      { name: 'Nidumba', keyword: 'nidumba', distanceKm: 9 },
       { name: 'Nileshwar', keyword: 'nileshwar', distanceKm: 10 },
       { name: 'Nileshwaram', keyword: 'nileshwaram', distanceKm: 10 },
       { name: 'Chittarikkal', keyword: 'chittarikkal', distanceKm: 15 },
@@ -60,6 +65,7 @@ export default function Checkout() {
       { pin: '671314', name: 'Nileshwar', distanceKm: 10 },
       { pin: '671326', name: 'Chittarikkal', distanceKm: 15 },
       { pin: '671315', name: 'Kanhangad', distanceKm: 18 },
+      { pin: '670353', name: 'Aravanchal', distanceKm: 12 },
     ];
 
     const currentPin = form.pincode ? form.pincode.trim() : '';
