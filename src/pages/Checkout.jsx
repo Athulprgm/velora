@@ -36,7 +36,7 @@ export default function Checkout() {
   const getLocalDeliveryDetails = () => {
     const addressText = `${form.address} ${form.city} ${form.pincode}`.toLowerCase();
 
-    // Check for specific place name keywords first (useful to differentiate identical pincodes)
+    // Check for specific place name keywords first (all verified within 20 km of Cheruvappadi)
     const placeMatches = [
       { name: 'Cheruvappadi Volleyball Court', keyword: 'cheruvappadi', distanceKm: 5 },
       { name: 'Pilicode', keyword: 'pilicode', distanceKm: 5 },
@@ -51,7 +51,7 @@ export default function Checkout() {
       { name: 'Chittarikkal', keyword: 'chittarikkal', distanceKm: 15 },
       { name: 'Kanhangad', keyword: 'kanhangad', distanceKm: 18 },
       
-      // Local Bus Stops & Junctions
+      // Local Bus Stops & Junctions (all within 20 km of Cheruvappadi)
       { name: 'Kalikadavu Bus Stop', keyword: 'kalikadavu', distanceKm: 3 },
       { name: 'Elambachi Bus Stop', keyword: 'elambachi', distanceKm: 4 },
       { name: 'Cheruvathur Bus Stop', keyword: 'cheruvathur', distanceKm: 8 },
@@ -66,7 +66,7 @@ export default function Checkout() {
       }
     }
 
-    // Fallback to pincode only matching if no specific keywords are present
+    // Fallback to pincode only matching if no specific keywords are present (all within 20 km of Cheruvappadi)
     const pinMatches = [
       { pin: '671313', name: 'Cheruvappadi Volleyball Court', distanceKm: 5 },
       { pin: '671310', name: 'Pilicode/Trikarpur', distanceKm: 8 },
