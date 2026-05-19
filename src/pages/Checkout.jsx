@@ -50,6 +50,14 @@ export default function Checkout() {
       { name: 'Nileshwaram', keyword: 'nileshwaram', distanceKm: 10 },
       { name: 'Chittarikkal', keyword: 'chittarikkal', distanceKm: 15 },
       { name: 'Kanhangad', keyword: 'kanhangad', distanceKm: 18 },
+      
+      // Local Bus Stops & Junctions
+      { name: 'Kalikadavu Bus Stop', keyword: 'kalikadavu', distanceKm: 3 },
+      { name: 'Elambachi Bus Stop', keyword: 'elambachi', distanceKm: 4 },
+      { name: 'Cheruvathur Bus Stop', keyword: 'cheruvathur', distanceKm: 8 },
+      { name: 'Chandera Bus Stop', keyword: 'chandera', distanceKm: 6 },
+      { name: 'Karivellur Bus Stop', keyword: 'karivellur', distanceKm: 9 },
+      { name: 'Payyannur Bus Stop', keyword: 'payyannur', distanceKm: 15 },
     ];
 
     for (const match of placeMatches) {
@@ -66,6 +74,8 @@ export default function Checkout() {
       { pin: '671326', name: 'Chittarikkal', distanceKm: 15 },
       { pin: '671315', name: 'Kanhangad', distanceKm: 18 },
       { pin: '670353', name: 'Aravanchal', distanceKm: 12 },
+      { pin: '670521', name: 'Karivellur', distanceKm: 9 },
+      { pin: '670307', name: 'Payyannur', distanceKm: 15 },
     ];
 
     const currentPin = form.pincode ? form.pincode.trim() : '';
