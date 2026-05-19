@@ -38,7 +38,7 @@ export default function Checkout() {
 
     // Check for specific place name keywords first (useful to differentiate identical pincodes)
     const placeMatches = [
-      { name: 'Cheruvappadi', keyword: 'cheruvappadi', distanceKm: 5 },
+      { name: 'Cheruvappadi Volleyball Court', keyword: 'cheruvappadi', distanceKm: 5 },
       { name: 'Pilicode', keyword: 'pilicode', distanceKm: 5 },
       { name: 'Trikarpur', keyword: 'trikarpur', distanceKm: 8 },
       { name: 'Nileshwar', keyword: 'nileshwar', distanceKm: 10 },
@@ -55,7 +55,7 @@ export default function Checkout() {
 
     // Fallback to pincode only matching if no specific keywords are present
     const pinMatches = [
-      { pin: '671313', name: 'Cheruvappadi/Hosdurg', distanceKm: 5 },
+      { pin: '671313', name: 'Cheruvappadi Volleyball Court', distanceKm: 5 },
       { pin: '671310', name: 'Pilicode/Trikarpur', distanceKm: 8 },
       { pin: '671314', name: 'Nileshwar', distanceKm: 10 },
       { pin: '671326', name: 'Chittarikkal', distanceKm: 15 },
@@ -202,7 +202,7 @@ export default function Checkout() {
 *Product Details:*
 • Item: ${product.name}
 • Price: ₹${basePrice}
-• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Local Pincode/Place: ${localName} - ${localDistance} km)` : '(Speed Post Flat Rate)'}
+• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Local: ${localDistance} km from Cheruvappadi Volleyball Court)` : '(Speed Post Flat Rate)'}
 • *Total Payable: ₹${totalPrice}*
 
 *Product Image:*
@@ -215,8 +215,9 @@ ${imageUrl}
 • Special Notes: ${form.notes || 'None'}
 
 *Delivery Distance & GPS (if used):*
-• Pincode/Place distance: ${isLocalDelivery ? `${localDistance} km` : 'Nationwide / Non-local'}
-• GPS: ${gpsString}
+• Origin: Cheruvappadi Volleyball Court
+• Distance/Destination: ${isLocalDelivery ? `${localDistance} km to ${localName}` : 'Nationwide / Non-local'}
+• GPS Pin: ${gpsString}
 
 -----------------------------------------
 *Payment Mode:* Cash on Delivery / UPI Inquiry`;
@@ -281,7 +282,7 @@ ${imageUrl}
                   </div>
                   {isLocalDelivery && (
                     <span className="text-[10px] text-[var(--accent-secondary)] font-bold flex items-center gap-1 mt-0.5 animate-fadeIn">
-                      <MapPin size={10} /> Local Studio Delivery ({localDistance} km to {localName})
+                      <MapPin size={10} /> Local Delivery ({localDistance} km from Cheruvappadi Volleyball Court)
                     </span>
                   )}
                   {!isLocalDelivery && form.pincode.trim().length >= 6 && (
@@ -355,7 +356,7 @@ ${imageUrl}
               <div className="mb-6 p-4 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm animate-fadeIn">
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-[var(--accent)] flex-shrink-0" />
-                  <span>Local Delivery Eligible: <strong>{localDistance} km</strong> to {localName} ({form.pincode || 'Manual'}).</span>
+                  <span>Local Delivery: <strong>{localDistance} km</strong> from Cheruvappadi Volleyball Court to {localName}.</span>
                 </div>
                 <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto">
                   Delivery Charge: ₹{deliveryCharge}
