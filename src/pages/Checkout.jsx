@@ -3,15 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, ShieldCheck, Truck, Package, MapPin, Compass, AlertCircle } from 'lucide-react';
 
-// Local Pincodes mapping (maximum limit 20 km from studio)
-const LOCAL_PINCODES = {
-  '671313': { name: 'Cheruvappadi/Hosdurg', distanceKm: 5 }, // Cheruvappadi origin
-  '671310': { name: 'Pilicode/Trikarpur', distanceKm: 8 },    // Pilicode (5 km) / Trikarpur (8 km)
-  '671314': { name: 'Nileshwar', distanceKm: 10 },           // Nileshwar (10 km)
-  '671326': { name: 'Chittarikkal', distanceKm: 15 },         // Chittarikkal (15 km)
-  '671315': { name: 'Kanhangad', distanceKm: 18 },           // Kanhangad (15-18 km)
-};
-
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,16 +32,52 @@ export default function Checkout() {
   // Base price extraction
   const basePrice = parseInt(product.price.replace(/[^\d]/g, ''), 10);
 
-  // Dynamic delivery charge calculation based on Pincode (local delivery up to 20 km)
-  const currentPin = form.pincode ? form.pincode.trim() : '';
-  const localPinData = LOCAL_PINCODES[currentPin];
-  let isLocalDelivery = false;
-  let localDistance = null;
+  // Helper to determine local delivery details based on address place name keywords or pincodes
+  const getLocalDeliveryDetails = () => {
+    const addressText = `${form.address} ${form.city} ${form.pincode}`.toLowerCase();
+
+    // Check for specific place name keywords first (useful to differentiate identical pincodes)
+    const placeMatches = [
+      { name: 'Cheruvappadi', keyword: 'cheruvappadi', distanceKm: 5 },
+      { name: 'Pilicode', keyword: 'pilicode', distanceKm: 5 },
+      { name: 'Trikarpur', keyword: 'trikarpur', distanceKm: 8 },
+      { name: 'Nileshwar', keyword: 'nileshwar', distanceKm: 10 },
+      { name: 'Nileshwaram', keyword: 'nileshwaram', distanceKm: 10 },
+      { name: 'Chittarikkal', keyword: 'chittarikkal', distanceKm: 15 },
+      { name: 'Kanhangad', keyword: 'kanhangad', distanceKm: 18 },
+    ];
+
+    for (const match of placeMatches) {
+      if (addressText.includes(match.keyword)) {
+        return { name: match.name, distanceKm: match.distanceKm };
+      }
+    }
+
+    // Fallback to pincode only matching if no specific keywords are present
+    const pinMatches = [
+      { pin: '671313', name: 'Cheruvappadi/Hosdurg', distanceKm: 5 },
+      { pin: '671310', name: 'Pilicode/Trikarpur', distanceKm: 8 },
+      { pin: '671314', name: 'Nileshwar', distanceKm: 10 },
+      { pin: '671326', name: 'Chittarikkal', distanceKm: 15 },
+      { pin: '671315', name: 'Kanhangad', distanceKm: 18 },
+    ];
+
+    const currentPin = form.pincode ? form.pincode.trim() : '';
+    const pinMatch = pinMatches.find(p => p.pin === currentPin);
+    if (pinMatch) {
+      return { name: pinMatch.name, distanceKm: pinMatch.distanceKm };
+    }
+
+    return null;
+  };
+
+  const localDeliveryDetails = getLocalDeliveryDetails();
+  const isLocalDelivery = !!localDeliveryDetails;
+  const localDistance = localDeliveryDetails ? localDeliveryDetails.distanceKm : null;
+  const localName = localDeliveryDetails ? localDeliveryDetails.name : '';
   let deliveryCharge = 40; // Default flat rate (Speed Post)
 
-  if (localPinData) {
-    isLocalDelivery = true;
-    localDistance = localPinData.distanceKm;
+  if (isLocalDelivery) {
     if (localDistance <= 5) {
       deliveryCharge = 20;
     } else {
@@ -175,7 +202,7 @@ export default function Checkout() {
 *Product Details:*
 • Item: ${product.name}
 • Price: ₹${basePrice}
-• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Local Pincode: ${localDistance} km)` : '(Speed Post Flat Rate)'}
+• Delivery Charge: ₹${deliveryCharge} ${isLocalDelivery ? `(Local Pincode/Place: ${localName} - ${localDistance} km)` : '(Speed Post Flat Rate)'}
 • *Total Payable: ₹${totalPrice}*
 
 *Product Image:*
@@ -188,7 +215,7 @@ ${imageUrl}
 • Special Notes: ${form.notes || 'None'}
 
 *Delivery Distance & GPS (if used):*
-• Pincode distance: ${isLocalDelivery ? `${localDistance} km` : 'Nationwide / Non-local'}
+• Pincode/Place distance: ${isLocalDelivery ? `${localDistance} km` : 'Nationwide / Non-local'}
 • GPS: ${gpsString}
 
 -----------------------------------------
@@ -254,7 +281,7 @@ ${imageUrl}
                   </div>
                   {isLocalDelivery && (
                     <span className="text-[10px] text-[var(--accent-secondary)] font-bold flex items-center gap-1 mt-0.5 animate-fadeIn">
-                      <MapPin size={10} /> Local Studio Delivery ({localDistance} km via Pincode)
+                      <MapPin size={10} /> Local Studio Delivery ({localDistance} km to {localName})
                     </span>
                   )}
                   {!isLocalDelivery && form.pincode.trim().length >= 6 && (
@@ -264,7 +291,7 @@ ${imageUrl}
                   )}
                   {!isLocalDelivery && form.pincode.trim().length < 6 && (
                     <span className="text-[10px] text-[var(--text-muted)] italic mt-0.5">
-                      (Enter local pincode or detect GPS for local rates)
+                      (Enter local pincode/address or detect GPS for local rates)
                     </span>
                   )}
                 </div>
@@ -328,7 +355,7 @@ ${imageUrl}
               <div className="mb-6 p-4 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-[var(--text)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-medium shadow-sm animate-fadeIn">
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-[var(--accent)] flex-shrink-0" />
-                  <span>Local Delivery Eligible: <strong>{localDistance} km</strong> ({localPinData.name} - Pincode {form.pincode}).</span>
+                  <span>Local Delivery Eligible: <strong>{localDistance} km</strong> to {localName} ({form.pincode || 'Manual'}).</span>
                 </div>
                 <span className="bg-[var(--accent)] text-white text-[10px] font-bold px-3 py-1 rounded-full w-fit sm:w-auto">
                   Delivery Charge: ₹{deliveryCharge}
